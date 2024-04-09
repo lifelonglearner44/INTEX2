@@ -1,8 +1,11 @@
 using INTEX2.Data;
+using INTEX2.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddRazorPages();
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -13,6 +16,13 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<ProductContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration["ConnectionStrings:ProductConnection"]);
+});
+
+builder.Services.AddScoped<IProductRepository, EFProductRepository>();
 
 var app = builder.Build();
 
